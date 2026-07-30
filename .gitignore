@@ -1,0 +1,11 @@
+# API keys / secrets — never commit
+*.env
+.env
+GOOGLE_API_KEY.txt
+
+# Jupyter / Colab
+.ipynb_checkpoints/
+__pycache__/
+
+# OS
+.DS_Store
