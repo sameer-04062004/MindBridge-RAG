@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist",
+  "buildCommand": "node -e \"if(require('fs').existsSync('frontend'))process.chdir('frontend');require('child_process').execSync('npm run build',{stdio:'inherit'})\"",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
