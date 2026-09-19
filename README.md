@@ -1,7 +1,7 @@
 ---
 title: MindBridge-RAG
 emoji: 🌿
-colorFrom: teal
+colorFrom: green
 colorTo: indigo
 sdk: gradio
 sdk_version: 6.28.0
