@@ -11,3 +11,4 @@ for p in [str(PARENT_DIR), str(ROOT_DIR)]:
         sys.path.insert(0, p)
 
 from backend.main import app
+
