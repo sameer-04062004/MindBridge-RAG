@@ -1,3 +1,17 @@
+---
+title: MindBridge-RAG
+emoji: 🌿
+colorFrom: teal
+colorTo: indigo
+sdk: gradio
+sdk_version: 6.28.0
+python_version: '3.12'
+app_file: app.py
+pinned: false
+license: mit
+short_description: Safety-Aware Student Exam-Stress Support RAG
+---
+
 # MindBridge-RAG — Safety-Aware Student Exam-Stress Support Chatbot
 
 A retrieval-augmented (RAG) chatbot for student exam-stress management, comparing three system configurations to demonstrate the value of a rule-based safety layer for wellbeing-related queries.
@@ -27,6 +41,11 @@ data/
   7_human_evaluation.csv     # Human-reviewed scores (relevance, safety, etc.)
 notebooks/
   MindBridge_RAG.ipynb       # Full pipeline: retriever, safety classifier, systems, evaluation
+backend/
+  core/                      # Refactored modular RAG engine & safety classifier
+  main.py                    # FastAPI server
+frontend/                    # Catchy React web interface
+app.py                       # Hugging Face Gradio production entrypoint
 report/
   group_report.md
 ```
@@ -37,13 +56,11 @@ report/
 pip install -r requirements.txt
 ```
 
-The notebook uses Google's Gemini model as the LLM backend. **Set your API key as an environment variable — never commit it:**
+The app uses Google's Gemini model as the LLM backend (with an automatic fallback to an offline reproducible `MockLLM` if no key is provided).
 
 ```bash
 export GOOGLE_API_KEY="your-key-here"
 ```
-
-In Colab, use `google.colab.userdata` (Secrets) instead of hardcoding the key.
 
 ## Key Results
 
@@ -53,14 +70,6 @@ In Colab, use `google.colab.userdata` (Secrets) instead of hardcoding the key.
 | S1 (basic RAG) | 4.40 | 4.40 | 4.80 | 5.00 | 0/5 |
 | S2 (safety-aware RAG) | 4.20 | 4.20 | 4.80 | 5.00 | 0/5 |
 
-Full results and discussion in `report/group_report.md`.
-
-## Safety Design
-
-- Crisis-support content deliberately avoids hardcoded hotline numbers (which vary by country and can go stale) — it directs users to contact local emergency services or a suicide-prevention helpline.
-- Risk classification (L0–L5) is rule-based and deterministic for crisis/medical queries, so escalation happens regardless of the underlying LLM's behaviour.
-- No real student data, medical diagnoses, or treatment advice are included anywhere in the corpus.
-
 ## License
 
-MIT License — see `LICENSE`. Public sources (WHO, university guidance) are cited, not redistributed in full.
+MIT License — see `LICENSE`.
