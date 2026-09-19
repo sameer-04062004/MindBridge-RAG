@@ -12,6 +12,7 @@ import {
   FileText,
   AlertTriangle
 } from 'lucide-react';
+import { runClientCompare } from '../engine/clientRAG';
 
 const BENCHMARK_SAMPLES = [
   { id: "Q001", label: "Study Skills (L0)", text: "What is active recall and how do I apply it?" },
@@ -31,17 +32,20 @@ export default function CompareArena() {
     if (!q.trim() || loading) return;
 
     setLoading(true);
+    let data;
     try {
       const res = await fetch('/api/compare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: q.trim() })
       });
-      const data = await res.json();
-      setComparison(data);
+      if (!res.ok) throw new Error("API route unavailable");
+      data = await res.json();
     } catch (err) {
-      console.error("Comparison error:", err);
+      // Seamless zero-failure fallback
+      data = await runClientCompare(q.trim());
     } finally {
+      if (data) setComparison(data);
       setLoading(false);
     }
   };

@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { X, BookOpen, Search, ExternalLink, ShieldCheck, Tag } from 'lucide-react';
 
+import { CHUNKS, SOURCES } from '../data/corpusData';
+
 export default function CorpusDrawer({ isOpen, onClose }) {
-  const [corpus, setCorpus] = useState({ sources: {}, chunks: [] });
+  const [corpus, setCorpus] = useState({ sources: SOURCES, chunks: CHUNKS });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('All');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      setLoading(true);
       fetch('/api/corpus')
-        .then(res => res.json())
-        .then(data => {
-          setCorpus(data);
-          setLoading(false);
+        .then(res => {
+          if (!res.ok) throw new Error("API not available");
+          return res.json();
         })
-        .catch(err => {
-          console.error("Failed to load corpus:", err);
-          setLoading(false);
+        .then(data => {
+          if (data && data.chunks && data.chunks.length) {
+            setCorpus(data);
+          }
+        })
+        .catch(() => {
+          // Keep bundled vetted corpus
         });
     }
   }, [isOpen]);

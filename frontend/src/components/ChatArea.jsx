@@ -17,6 +17,7 @@ import {
   Stethoscope,
   Info
 } from 'lucide-react';
+import { runClientChat } from '../engine/clientRAG';
 
 const STARTER_PROMPTS = [
   { text: "How do I calm my nerves the night before an exam?", category: "Exam Stress (L1)", icon: Sparkles },
@@ -71,6 +72,7 @@ export default function ChatArea({ mode, setMode, onOpenBreathing }) {
     setInput('');
     setLoading(true);
 
+    let data;
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -80,39 +82,27 @@ export default function ChatArea({ mode, setMode, onOpenBreathing }) {
           system: mode
         })
       });
-
-      const data = await res.json();
-
-      setMessages([
-        ...newMessages,
-        {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          system: data.system,
-          text: data.text,
-          risk_label: data.risk_label,
-          risk_meta: data.risk_meta,
-          response_time: data.response_time,
-          retrieved_chunks: data.retrieved_chunks || []
-        }
-      ]);
+      if (!res.ok) throw new Error("API route unavailable");
+      data = await res.json();
     } catch (err) {
-      console.error("Chat error:", err);
-      setMessages([
-        ...newMessages,
-        {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          system: mode,
-          text: "I encountered a network issue connecting to the MindBridge engine. Please check that the backend server is running.",
-          risk_label: 'ERROR',
-          risk_meta: { badge_color: 'rose', label: 'Connection Error' },
-          retrieved_chunks: []
-        }
-      ]);
-    } finally {
-      setLoading(false);
+      // Seamless zero-failure fallback using local RAG engine
+      data = await runClientChat(query.trim(), mode);
     }
+
+    setMessages([
+      ...newMessages,
+      {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        system: data.system || mode,
+        text: data.text,
+        risk_label: data.risk_label,
+        risk_meta: data.risk_meta,
+        response_time: data.response_time,
+        retrieved_chunks: data.retrieved_chunks || []
+      }
+    ]);
+    setLoading(false);
   };
 
   const copyToClipboard = (id, text) => {
