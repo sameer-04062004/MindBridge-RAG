@@ -1,0 +1,4 @@
+group_id,source_id,source_title,source_type,source_link_or_reference,reason_for_use
+G01,S001,"WHO - Doing What Matters in Times of Stress (public stress-management guidance)","Web article","https://www.who.int/publications/i/item/9789240003927","General, evidence-informed stress-management, breathing and grounding techniques suitable for students"
+G01,S002,"University Student Counselling Service - Exam Stress Self-Help Guide","Guide","Generic public university student wellbeing/counselling self-help material","Student-focused, safe guidance on coping with exam stress and when to seek human support"
+G01,S003,"Academic Skills Centre - Study Strategies and Time Management Guide","Guide","Generic public university academic skills centre study-skills material","Practical, safe study techniques, time management, and exam preparation strategies"
