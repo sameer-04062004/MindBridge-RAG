@@ -13,8 +13,14 @@ from backend.core.safety import classify_risk, RISK_METADATA
 # Initialize engine
 engine = MindBridgeEngine(data_dir=str(ROOT / "data"))
 
+try:
+    import spaces
+    SPACES_AVAILABLE = True
+except Exception:
+    SPACES_AVAILABLE = False
+
 # --- Gradio Callback Functions ---
-def answer_chat(message, history, system_choice):
+def _answer_chat(message, history, system_choice):
     if not message.strip():
         return "", history, "No query entered", ""
     
@@ -48,7 +54,7 @@ def answer_chat(message, history, system_choice):
     history.append((message, resp.text))
     return "", history, status_summary, citations_text
 
-def run_comparison(query_text):
+def _run_comparison(query_text):
     if not query_text.strip():
         return "Please enter a question to compare.", "", "", ""
     comp = engine.compare_all(query_text)
@@ -82,6 +88,19 @@ def run_comparison(query_text):
     )
     
     return risk_summary, s0_out, s1_out, s2_out
+
+# Decorate with spaces.GPU when running on Hugging Face ZeroGPU
+if SPACES_AVAILABLE:
+    try:
+        answer_chat = spaces.GPU(_answer_chat)
+        run_comparison = spaces.GPU(_run_comparison)
+    except Exception:
+        answer_chat = _answer_chat
+        run_comparison = _run_comparison
+else:
+    answer_chat = _answer_chat
+    run_comparison = _run_comparison
+
 
 # --- Build Corpus Table Data ---
 corpus_rows = []
@@ -271,3 +290,4 @@ with gr.Blocks(title="MindBridge-RAG") as demo:
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=7860, theme=custom_theme)
+
